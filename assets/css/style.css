@@ -1,0 +1,31 @@
+.app {
+    display: grid;
+    width: 100%;
+    height: 100dvh;
+    grid-template-areas:
+        "left-sidebar main-view right-sidebar"
+        "now-playing-bar now-playing-bar now-playing-bar";
+}
+
+.search-box {}
+
+#lyrics {
+    background: rgba(23, 15, 35, 0.8);
+    ;
+    height: 420px;
+    overflow: scroll;
+}
+
+#lyrics .line {
+    display: block;
+    color: #fff;
+    padding: 12px;
+}
+
+#lyrics .line.is-over {
+    color: hsla(0, 0%, 100%, .5);
+}
+
+#lyrics .line.is-active {
+    color: #ffed00;
+}

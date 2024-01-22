@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beat Buddy</title>
+
+    <!-- ## Font -->
+    <link rel="stylesheet" href="./assets/font/font.css">
+
+    <!-- ## CSS -->
+    <link rel="stylesheet" href="./assets/css/reset.css">
+    <link rel="stylesheet" href="./assets/css/grid.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <!-- <link rel="stylesheet" href="./assets/css/responsive.css"> -->
+</head>
+
+<body>
+    <main class="app">
+        <section class="left-sidebar">
+            <audio id="audioPlayer" controls onended="next()" ontimeupdate="handleOnTimeUpdate(event)">
+                <p>Your browser does not support the audio tag.</p>
+            </audio>
+            <div style="margin: 12px;"><button onclick="previous()">Previous</button><button
+                    onclick="next()">Next</button></div>
+            <ul id="lyrics">
+            </ul>
+        </section>
+        <div class="main-view">
+            <div class="container-fluid">
+                <div class="search-box">
+                    <input class="search-inp" type="text" oninput="handleSearchInput(event)">
+                    <ul id="search-result" class="search-result">
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <section class="right-sidebar"></section>
+        <section class="now-playing-bar">
+        </section>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.1/hls.min.js"
+        integrity="sha512-nIbvrKaS3WYCpXgsIqmXOFHrYNWmzQv+F93zKt3VqPTdQrdIyosYL3OvIuG6sRpEGCH6K6r+rtiwmOSmwHl1uQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const audioElem = document.getElementById('audioPlayer')
+        const lyricsElem = document.getElementById('lyrics');
+        function timeToSeconds(timeString) {
+            var [mins, secs] = timeString.split(':').map(Number);
+            return mins * 60 + secs;
+        } let lyricsLines = '';
+        let lrc = `
+                    [02:44.25] Muộn rồi mà sao còn
+                    [02:46.10] Nhìn lên trần nhà
+                    [02:47.17] Rồi quay ra lại quay vào
+                    [02:49.83] Nằm trằn trọc vậy đến sáng mai
+                    [02:51.69] Ôm tương tư, nụ cười của ai đó
+                    [02:53.02] Làm con tim ngô nghê
+                    [02:54.08] Như muốn khóc òa
+                    [02:54.87] Vắt tay lên trên trán mơ mộng
+                    [02:56.73] Được đứng bên em
+                    [02:57.53] Trong nắng xuân hồng
+                    [02:58.60] 1 giờ sáng trôi qua trôi nhanh
+                    [03:00.98] Kéo theo ưu phiền miên man
+                    [03:03.11] Âm thầm gieo tên em
+                    [03:04.43] Vẽ lên hi vọng
+                    [03:05.23] Đúng là yêu thật rồi
+                    [03:06.83] Còn không thì hơi phí này
+                    [03:08.68] Cứ thế loanh quanh loanh quanh
+                    [03:10.01] Loanh quanh lật qua lật lại 2 giờ
+                    [03:12.40] Những ngôi sao trên cao
+                    [03:14.00] Là người bạn tâm giao
+                    [03:15.86] Lắng nghe anh luyên thuyên
+                    [03:16.92] Về một tình đầu đẹp tựa chiêm bao
+                    [03:19.05] Có nghe thôi đã thấy ngọt ngào
+                    [03:20.90] Đủ biết anh si mê em nhường nào
+                    [03:22.76] Ít khi văn thơ anh dạt dào
+                    [03:24.10] Bụng đói nhưng vui quên luôn cồn cào
+                    [03:25.95] Nắm đôi tay kiêu sa
+                    [03:27.54] Được một lần không ta
+                    [03:29.40] Nghĩ qua thôi con tim trong anh
+                    [03:30.99] Đập tung lên rung nóc rung nhà
+                    [03:32.86] Hóa ra yêu đơn phương một người
+                    [03:34.45] Hóa ra khi tơ vương một người
+                    [03:36.31] 3 giờ đêm vẫn ngồi cười
+                    [03:39.23] Cứ ôm anh đi ôm anh đi
+                    [03:41.10] Ôm anh đi ôm anh đi
+                    [03:42.69] Ôm trong cơn mơ trong cơn mơ
+                    [03:44.28] Trong cơn mơ trong cơn mơ
+                    [03:46.14] Có thế cũng khiến anh vui điên lên
+                    [03:48.26] Ngỡ như em đang bên
+                    [03:49.61] Chắp bút đôi ba câu thơ
+                    [03:51.20] Ngọt ngào muốn em đặt tên
+                    [03:52.79] Cứ ôm anh đi ôm anh đi
+                    [03:54.66] Ôm anh đi ôm anh đi
+                    [03:56.24] Ôm trong giấc mơ trong cơn mơ
+                    [03:58.11] Trong cơn mơ trong cơn mơ
+                    [03:59.70] Yêu đến vậy thôi
+                    [04:01.82] Phát điên rồi làm sao giờ
+                    [04:38.39] Đêm nay không ngủ
+                    [04:40.01] Tay kê lên tủ
+                    [04:41.61] Miên man anh tranh thủ
+                    [04:42.92] Chơi với suy tư bao nhiêu cho đủ
+                    [04:45.05] Yêu em ngu ngơ mình tôi
+                    [04:46.64] Yêu không quan tâm ngày trôi
+                    [04:48.50] Yêu ánh mắt bờ môi
+                    [04:50.83] Yêu đơn phương vậy thôi
+                    [04:52.43] Lại còn chối
+                    [04:53.49] Con tim thẹn thùng đập lạc lối liên hồi
+                    [04:55.62] Đừng chày cối
+                    [04:56.94] Miệng cười cả ngày vậy là chết toi rồi
+                    [04:59.08] Ngày càng nhiều thêm
+                    [05:00.13] Tình yêu cho em ngày càng nhiều thêm
+                    [05:01.99] Muốn nắm đôi bàn tay đó một lần
+                    [05:03.59] Du dương chìm sâu
+                    [05:04.12] Trong từng câu ca dịu êm
+                    [05:05.17] Những ngôi sao trên cao
+                    [05:07.03] Là người bạn tâm giao
+                    [05:08.90] Lắng nghe anh luyên thuyên
+                    [05:09.96] Về một tình đầu đẹp tựa chiêm bao
+                    [05:12.35] Có nghe thôi đã thấy ngọt ngào
+                    [05:13.94] Đủ biết anh si mê em nhường nào
+                    [05:15.80] Ít khi văn thơ anh dạt dào
+                    [05:17.13] Bụng đói nhưng vui
+                    [05:17.92] Quên luôn cồn cào
+                    [05:19.26] Nắm đôi tay kiêu sa
+                    [05:20.86] Được một lần không ta
+                    [05:22.71] Nghĩ qua thôi con tim trong anh
+                    [05:24.04] Đập tung lên rung nóc rung nhà
+                    [05:25.91] Hóa ra yêu đơn phương một người
+                    [05:27.75] Hóa ra khi tơ vương một người
+                    [05:29.36] 3 giờ đêm vẫn ngồi cười
+                    [05:32.27] Cứ ôm anh đi ôm anh đi
+                    [05:34.13] Ôm anh đi ôm anh đi
+                    [05:35.72] Ôm trong cơn mơ trong cơn mơ
+                    [05:37.58] Trong cơn mơ trong cơn mơ
+                    [05:39.18] Có thế cũng khiến anh vui điên lên
+                    [05:41.30] Ngỡ như em đang bên
+                    [05:42.90] Chắp bút đôi ba câu thơ
+                    [05:44.22] Ngọt ngào muốn em đặt tên
+                    [05:45.82] Cứ ôm anh đi ôm anh đi
+                    [05:47.68] Ôm anh đi ôm anh đi
+                    [05:49.29] Ôm trong giấc mơ trong cơn mơ
+                    [05:51.13] Trong cơn mơ trong cơn mơ
+                    [05:52.99] Yêu đến vậy thôi
+                    [05:54.85] Phát điên rồi làm sao giờ
+                    [06:27.39] Em xinh như một thiên thần
+                    [06:29.26] Như một thiên thần
+                    [06:30.84] Như một thiên thần
+                    [06:32.44] Ngỡ như em là thiên thần
+                    [06:34.29] Xinh như một thiên thần
+                    [06:35.89] Như một thiên thần
+                    [06:40.94] Em xinh như một thiên thần
+                    [06:42.79] Như một thiên thần
+                    [06:44.39] Như một thiên thần
+                    [06:45.99] Ngỡ như em là thiên thần
+                    [06:47.84] Ngỡ như ngỡ như
+                    [06:49.63] Ngỡ như ngỡ như ngỡ như`
+        // Your M3U8 audio file URL
+        var audioUrl = 'https://raw.githubusercontent.com/vutiendat3601/cdn/_/aud/r000/563745ce12e5fae4d3a6123c2f6705cb/563745ce12e5fae4d3a6123c2f6705cb.m3u8';
+        var hls = null;
+        if (Hls.isSupported()) {
+            hls = new Hls();
+            hls.loadSource(audioUrl);
+            hls.attachMedia(document.getElementById('audioPlayer'));
+        } else if (document.getElementById('audioPlayer').canPlayType('application/vnd.apple.mpegurl')) {
+            // For Safari
+            document.getElementById('audioPlayer').src = audioUrl;
+        }
+        const lines = lrc.split('\n').filter(Boolean); // Split lines and remove empty lines
+        const regex = /^\[(\d{2}:\d{2}\.\d{2})\]\s(.*)$/;
+        const transcripts = [];
+        let curLyrics = { start: 0, end: 0 };
+
+        lines.forEach((line, index) => {
+            line = line.trim();
+            const match = regex.exec(line);
+            if (match) {
+                const timestamp = match[1];
+                const content = match[2];
+                // Get the Unix timestamp in seconds
+                const timestampInSeconds = timeToSeconds(timestamp);
+                const transcript = { start: timestampInSeconds, end: 1000, content: content };
+                if (transcripts.length > 0) {
+                    transcripts[transcripts.length - 1].end = timestampInSeconds;
+                }
+                // console.log(`Line ${index + 1}:`);
+                // console.log('Timestamp:', timestamp);
+                // console.log('Content:', content);
+                // console.log('---');
+                transcripts.push(transcript);
+            } else {
+                console.log(`Line ${index + 1} ${line}: Invalid input format`);
+                console.log('---');
+            }
+        });
+        lyricsLines = transcripts.reduce((res, cur) => res += `<li class="line">${cur.content}</li>`, "");
+        console.log(lyricsLines);
+        lyricsElem.innerHTML = lyricsLines;
+        function handleOnTimeUpdate(e) {
+            const curTimeSec = e.target.currentTime;
+            if (curTimeSec >= curLyrics.end || curTimeSec < curLyrics.start) {
+                let index = transcripts.indexOf(transcripts.find(t => t.start <= curTimeSec && curTimeSec < t.end));
+
+                lyricsLines = '';
+                for (i = 0; i < index; i++) {
+                    lyricsLines += `<li class="line is-over">${transcripts[i].content}</li>`;
+                }
+                if (index > -1) {
+                    curLyrics.start = transcripts[index].start;
+                    curLyrics.end = transcripts[index].end;
+                    lyricsLines += `<li class="line is-active">${transcripts[index].content}</li>`;
+                } else {
+                    curLyrics.start = 0;
+                    curLyrics.end = 0;
+                }
+                for (i = index + 1; i < transcripts.length; i++) {
+                    lyricsLines += `<li class="line">${transcripts[i++].content}</li>`;
+                }
+                lyricsElem.innerHTML = lyricsLines;
+            }
+        }
+    </script>
+    <script>
+        let searchTimer = 0;
+        const API_BASE_URL = "http://bbapi.datvu.tech";
+        const searchResultElem = document.getElementById("search-result");
+        let trackIndex = -1; let playableTracks = [];
+        function handleSearchInput(e) {
+            const keyword = e.target.value;
+            window.clearTimeout(searchTimer);
+            searchTimer = window.setTimeout(() => {
+                search(keyword)
+            }, 500);
+        }
+        async function search(keyword) {
+            const resp = await fetch(`${API_BASE_URL}/v1/search?page=0&size=50&types=artist,track&q=${keyword}`);
+            const json = await resp.json();
+            const searchResult = json.data;
+            console.log(searchResult);
+            const track = searchResult.track;
+            playableTracks = track.items.filter(t => t.isPlayable);
+            trackIndex = 0;
+            if (playableTracks.length > 0) {
+                getStream(playableTracks[trackIndex].id);
+            }
+            let searchTrackElems = track.items.reduce((res, t) => (res += `<li><p class="name">${t.name}</p><p class="artist">${t.artists.reduce((res, a, index) => (res += `${index > 0 ? ', ' : ''}${a.name}`), "")}</p></li>`))
+            searchResultElem.innerHTML = searchTrackElems;
+        }
+        async function getStream(trackId) {
+            const resp = await fetch(`${API_BASE_URL}/v1/tracks/${trackId}/stream`);
+            const json = await resp.json();
+            const stream = json.data;
+            if (hls) {
+                hls.loadSource(stream.links.kbps128[0]);
+            }
+            // audioElem.src = stream.links.kbps128;
+        }
+        async function previous() {
+            if (isPlayable()) {
+                trackIndex = --trackIndex % playableTracks.length;
+                await getStream(playableTracks[trackIndex].id);
+                console.log(audioElem);
+                audioElem.play();
+            }
+        }
+        async function next() {
+            if (isPlayable()) {
+                trackIndex = ++trackIndex % playableTracks.length;
+                await getStream(playableTracks[trackIndex].id);
+                console.log(audioElem);
+                audioElem.play();
+            }
+        }
+
+        function isPlayable() {
+            return playableTracks.length != 0;
+        }
+    </script>
+</body>
+
+</html>
