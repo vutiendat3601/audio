@@ -1,3 +1,12 @@
+button {
+    margin-left: 4px;
+    padding: 4px 20px;
+}
+
+button~button {
+    margin-left: 12px;
+}
+
 .app {
     display: grid;
     width: 100%;
@@ -7,8 +16,15 @@
         "now-playing-bar now-playing-bar now-playing-bar";
 }
 
-.search-box {}
-
+.search-box {
+    margin-top: 24px;
+}
+.search-box .search-inp {
+    font-size: 1.6rem;
+    outline: none;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+}
 #lyrics {
     background: rgba(23, 15, 35, 0.8);
     ;
@@ -28,4 +44,12 @@
 
 #lyrics .line.is-active {
     color: #ffed00;
+}
+
+.track {
+    display: flex;
+    align-items: center;
+    column-gap: 12px;
+    font-size: 1.2rem;
+    padding: 8px;
 }

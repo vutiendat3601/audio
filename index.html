@@ -32,7 +32,6 @@
                 <div class="search-box">
                     <input class="search-inp" type="text" oninput="handleSearchInput(event)">
                     <ul id="search-result" class="search-result">
-
                     </ul>
                 </div>
             </div>
@@ -246,7 +245,7 @@
             if (playableTracks.length > 0) {
                 getStream(playableTracks[trackIndex].id);
             }
-            let searchTrackElems = track.items.reduce((res, t) => (res += `<li><p class="name">${t.name}</p><p class="artist">${t.artists.reduce((res, a, index) => (res += `${index > 0 ? ', ' : ''}${a.name}`), "")}</p></li>`))
+            let searchTrackElems = track.items.reduce((res, t, index) => (res += `<li class="track"><p class="name">${t.name}:</p><p class="artist">${t.artists.reduce((res, a, index) => (res += `${index > 0 ? ', ' : ''}${a.name}`), "")}${t.isPlayable && `<button onclick="play(${index})">Play</button></p></li>`}`), "")
             searchResultElem.innerHTML = searchTrackElems;
         }
         async function getStream(trackId) {
@@ -262,7 +261,6 @@
             if (isPlayable()) {
                 trackIndex = --trackIndex % playableTracks.length;
                 await getStream(playableTracks[trackIndex].id);
-                console.log(audioElem);
                 audioElem.play();
             }
         }
@@ -270,9 +268,16 @@
             if (isPlayable()) {
                 trackIndex = ++trackIndex % playableTracks.length;
                 await getStream(playableTracks[trackIndex].id);
-                console.log(audioElem);
                 audioElem.play();
             }
+        }
+
+        async function play(index) {
+            trackIndex = index;
+            if (isPlayable()) {
+            await getStream(playableTracks[trackIndex].id);
+            audioElem.play();
+        }
         }
 
         function isPlayable() {
