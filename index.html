@@ -46,6 +46,7 @@
     <script>
         const audioElem = document.getElementById('audioPlayer')
         const lyricsElem = document.getElementById('lyrics');
+        const searchedTracks = [];
         function timeToSeconds(timeString) {
             var [mins, secs] = timeString.split(':').map(Number);
             return mins * 60 + secs;
@@ -238,13 +239,13 @@
             const resp = await fetch(`${API_BASE_URL}/v1/search?page=0&size=50&types=artist,track&q=${keyword}`);
             const json = await resp.json();
             const searchResult = json.data;
-            console.log(searchResult);
             const track = searchResult.track;
             playableTracks = track.items.filter(t => t.isPlayable);
             trackIndex = 0;
             if (playableTracks.length > 0) {
                 getStream(playableTracks[trackIndex].id);
             }
+            searchedTracks = track.items;
             let searchTrackElems = track.items.reduce((res, t, index) => (res += `<li class="track"><p class="name">${t.name}:</p><p class="artist">${t.artists.reduce((res, a, index) => (res += `${index > 0 ? ', ' : ''}${a.name}`), "")}${t.isPlayable && `<button onclick="play(${index})">Play</button></p></li>`}`), "")
             searchResultElem.innerHTML = searchTrackElems;
         }
@@ -274,10 +275,8 @@
 
         async function play(index) {
             trackIndex = index;
-            if (isPlayable()) {
-            await getStream(playableTracks[trackIndex].id);
+            await getStream(searchedTracks[trackIndex].id);
             audioElem.play();
-        }
         }
 
         function isPlayable() {
