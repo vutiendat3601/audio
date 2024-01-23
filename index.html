@@ -197,7 +197,6 @@
             }
         });
         lyricsLines = transcripts.reduce((res, cur) => res += `<li class="line">${cur.content}</li>`, "");
-        console.log(lyricsLines);
         lyricsElem.innerHTML = lyricsLines;
         function handleOnTimeUpdate(e) {
             const curTimeSec = e.target.currentTime;
@@ -228,6 +227,11 @@
         const API_BASE_URL = "http://bbapi.datvu.tech";
         const searchResultElem = document.getElementById("searchResult");
         let trackIndex = -1; let playableTracks = [];
+        searchResultElem.onscroll = (e) => {
+            console.log(e)
+            console.log(searchResultElem.clientHeight);
+            console.log(searchResultElem.scrollTop)
+        } 
         function handleSearchInput(e) {
             const keyword = e.target.value;
             window.clearTimeout(searchTimer);
@@ -274,7 +278,6 @@
         }
 
         async function play(index) {
-            trackIndex = index;
             await getStream(searchedTracks[trackIndex].id);
             audioElem.play();
         }
