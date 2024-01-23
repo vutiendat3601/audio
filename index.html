@@ -46,7 +46,7 @@
     <script>
         const audioElem = document.getElementById('audioPlayer')
         const lyricsElem = document.getElementById('lyrics');
-        const searchedTracks = [];
+        let searchedTracks = [];
         function timeToSeconds(timeString) {
             var [mins, secs] = timeString.split(':').map(Number);
             return mins * 60 + secs;
