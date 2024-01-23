@@ -25,6 +25,11 @@ button~button {
     border: 1px solid #aaa;
     border-radius: 4px;
 }
+.search-result {
+    height: calc(100dvh - 100px);
+    overflow-y: auto;
+}
+
 #lyrics {
     background: rgba(23, 15, 35, 0.8);
     ;

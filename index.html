@@ -31,7 +31,7 @@
             <div class="container-fluid">
                 <div class="search-box">
                     <input class="search-inp" type="text" oninput="handleSearchInput(event)">
-                    <ul id="search-result" class="search-result">
+                    <ul id="searchResult" class="search-result">
                     </ul>
                 </div>
             </div>
@@ -225,7 +225,7 @@
     <script>
         let searchTimer = 0;
         const API_BASE_URL = "http://bbapi.datvu.tech";
-        const searchResultElem = document.getElementById("search-result");
+        const searchResultElem = document.getElementById("searchResult");
         let trackIndex = -1; let playableTracks = [];
         function handleSearchInput(e) {
             const keyword = e.target.value;
