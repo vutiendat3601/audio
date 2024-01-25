@@ -250,7 +250,7 @@
                 getStream(playableTracks[trackIndex].id);
             }
             searchedTracks = track.items;
-            let searchTrackElems = track.items.reduce((res, t, index) => (res += `<li class="track"><p class="name">${t.name}:</p><p class="artist">${t.artists.reduce((res, a, index) => (res += `${index > 0 ? ', ' : ''}${a.name}`), "")}${t.isPlayable && `<button onclick="play(${index})">Play</button></p></li>`}`), "")
+            let searchTrackElems = track.items.reduce((res, t, index) => (res += `<li class="track"><img class="thumbnail" src="${t.thumbnail}" alt="${t.name}" onerror="this.onerror=null; this.src='${t.artists[0].thumbnail}'"><p class="name">${t.name}:</p><p class="artist">${t.artists.reduce((res, a, index) => (res += `${index > 0 ? ', ' : ''}${a.name}`), "")}${t.isPlayable && `<button onclick="play(${index})">Play</button></p></li>`}`), "")
             searchResultElem.innerHTML = searchTrackElems;
         }
         async function getStream(trackId) {
