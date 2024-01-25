@@ -30,7 +30,8 @@
         <div class="main-view">
             <div class="container-fluid">
                 <div class="search-box">
-                    <input class="search-inp" type="text" oninput="handleSearchInput(event)" placeholder="Search artists, tracks">
+                    <input class="search-inp" type="text" oninput="handleSearchInput(event)"
+                        placeholder="Search artists, tracks">
                     <ul id="searchResult" class="search-result">
                     </ul>
                 </div>
@@ -231,13 +232,21 @@
             console.log(e)
             console.log(searchResultElem.clientHeight);
             console.log(searchResultElem.scrollTop)
-        } 
+        }
         function handleSearchInput(e) {
             const keyword = e.target.value;
             window.clearTimeout(searchTimer);
             searchTimer = window.setTimeout(() => {
                 search(keyword)
             }, 500);
+        }
+        function secondsToMinutesAndSeconds(durationInSeconds) {
+            const minutes = Math.floor(durationInSeconds / 60);
+            const seconds = Math.floor(durationInSeconds % 60);
+
+            // You can also use string interpolation or concatenation for formatting
+            // For example: return `${minutes} minutes and ${seconds} seconds`;
+            return `${minutes}:${seconds}`;
         }
         async function search(keyword) {
             const resp = await fetch(`${API_BASE_URL}/v1/search?page=0&size=50&types=artist,track&q=${keyword}`);
@@ -250,7 +259,11 @@
                 getStream(playableTracks[trackIndex].id);
             }
             searchedTracks = track.items;
-            let searchTrackElems = track.items.reduce((res, t, index) => (res += `<li class="track"><img class="thumbnail" src="${t.thumbnail}" alt="${t.name}" onerror="this.onerror=null; this.src='${t.artists[0].thumbnail}'"><p class="name">${t.name}:</p><p class="artist">${t.artists.reduce((res, a, index) => (res += `${index > 0 ? ', ' : ''}${a.name}`), "")}${t.isPlayable && `<button onclick="play(${index})">Play</button></p></li>`}`), "")
+            let searchTrackElems = track.items.reduce((res, t, index) =>
+            (
+                res += `<li class="track"><img class="thumbnail" src="${t.thumbnail}" alt="${t.name}" x_onerror="this.onerror=null; this.src='${t.artists[0].thumbnail}'"><p class="name">${t.name} (${secondsToMinutesAndSeconds(t.durationSec)}):</p><p class="artist">${t.artists.reduce((res, a, index) => (res += `${index > 0 ? ', ' : ''}${a.name}`), "")}${t.isPlayable && `<button onclick="play(${index})">Play</button></p></li>`}`),
+                ""
+            )
             searchResultElem.innerHTML = searchTrackElems;
         }
         async function getStream(trackId) {
